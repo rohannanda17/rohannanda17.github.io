@@ -3,8 +3,7 @@
 <head>
         <meta charset="utf-8" />
         <title>My Experiments with NLP in Legal Informatics - python</title>
-        <link rel="stylesheet" href="http://rohannanda17.github.io/theme/css/main.css" />
-        <link href="http://rohannanda17.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="My Experiments with NLP in Legal Informatics Atom Feed" />
+        <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
             <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -13,25 +12,25 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="http://rohannanda17.github.io/">My Experiments with NLP in Legal Informatics </a></h1>
+                <h1><a href="/">My Experiments with NLP in Legal Informatics </a></h1>
                 <nav><ul>
-                    <li><a href="http://rohannanda17.github.io/category/posts.html">posts</a></li>
+                    <li><a href="/category/posts.html">posts</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://rohannanda17.github.io/first-post.html">First Post</a></h1>
+                    <h1 class="entry-title"><a href="/first-post.html">Unsupervised Text Similarity using Vector Space Model and Latent Semantic Analysis</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2016-06-08T20:00:00+02:00">
-                Published: Wed 08 June 2016
+        <abbr class="published" title="2018-04-24T14:00:00+02:00">
+                Published: Tue 24 April 2018
         </abbr>
 
         <address class="vcard author">
-                By                         <a class="url fn" href="http://rohannanda17.github.io/author/rohan.html">Rohan</a>
+                By                         <a class="url fn" href="/author/rohan.html">Rohan</a>
         </address>
-<p>In <a href="http://rohannanda17.github.io/category/posts.html">posts</a>.</p>
-<p>tags: <a href="http://rohannanda17.github.io/tag/python.html">python</a> </p>
+<p>In <a href="/category/posts.html">posts</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/text-similarity.html">Text Similarity</a> <a href="/tag/latent-semantic-analysis.html">Latent Semantic Analysis</a> </p>
 </footer><!-- /.post-info --><style type="text/css">/*!
 *
 * IPython notebook
@@ -1002,19 +1001,53 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="First-post!">First post!<a class="anchor-link" href="#First-post!">&#182;</a></h1><p>This will be the first post in our new Pelican blog! You can add any code or markdown cells to this Jupyter notebook, and they will be rendered on your blog.</p>
+<p>This post will be about using Unsupervised Techniques to find Semantically Similar Legal Provisions. In European Law, the Directives are implemented (or enforced) by national implementing measures (NIMs) as they are not directly applicable. These NIMs implement the directives in the national legal structure of each European Member State. Therfore, the language and terminologies of NIMs can be both similar and different from the directive. If a legal professional needs to find a particular provision of NIM which implements a particular article of directive, then he/she needs to read and interpret each provision. In this post, we will address this task by using text similarity techniques.</p>
+<p><img src="dir_nim_similarity.png" width="500" height="500" align="center" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Both Directives and NIMs are in a proprieatry XML format as shown above. The Figure above shows a particular European Directive being implemented by two national implementing measures (NIMs). We will develop a semantic similarity system to retrieve the relevant NIM provisions for a particular article of the directive.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[70]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">random</span>
+<div class=" highlight hl-ipython3"><pre><span class="c">#Reading Directives and NIMs</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s">r&quot;D:\xml_all_update-1\Directive 35&quot;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="n">tree1</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;32009L0128_EN.xml&#39;</span><span class="p">)</span>
+<span class="n">root1</span> <span class="o">=</span> <span class="n">tree1</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
 
-<span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">tree2</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;NIM_Ireland.xml&#39;</span><span class="p">)</span>
+<span class="n">root2</span><span class="o">=</span> <span class="n">tree2</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+<span class="c">#This function provides a list of provisions for each XML</span>
+<span class="k">def</span> <span class="nf">append_provisions</span><span class="p">(</span><span class="n">root</span><span class="p">,</span><span class="n">prov_list</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">root</span><span class="p">:</span>
+        <span class="n">prov_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">prov_list</span>
+
+<span class="c">#We make two empty lists which will store the provisions from directives and NIMs respectively</span>
+<span class="n">dirs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">nims</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">dirs</span> <span class="o">=</span> <span class="n">append_provisions</span><span class="p">(</span><span class="n">root1</span><span class="p">,</span><span class="n">dirs</span><span class="p">)</span> <span class="c">#we strip new line symbols coming from xml file to the list</span>
+<span class="n">nims</span> <span class="o">=</span> <span class="n">append_provisions</span><span class="p">(</span><span class="n">root2</span><span class="p">,</span><span class="n">nims</span><span class="p">)</span>
+
+<span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">]</span>
+<span class="n">nims</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">nims</span><span class="p">]</span>
+    
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;The article number 0 of directive: </span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
 </pre></div>
 
 </div>
@@ -1027,15 +1060,153 @@ h6:hover .anchor-link {
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[2]:</div>
+<div class="prompt"></div>
 
 
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>4</pre>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The article number 0 of directive: 
+This Directive establishes a framework to achieve a sustainable use of pesticides by reducing the risks and impacts of pesticide use on human health and the environment and promoting the use of integrated pest management and of alternative approaches or techniques such as non-chemical alternatives to pesticides.
+</pre>
+</div>
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we will do NLP pre-processing to remove noise from the text. This will involve a number of steps like</p>
+<p>1.Tokenization</p>
+<p>2.Lowercasing</p>
+<p>3.Stop word removal</p>
+<p>4.POS tagging</p>
+<p>5.Lemmatization</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[71]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="c">#Preprocessing</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">from</span> <span class="nn">nltk</span> <span class="k">import</span> <span class="n">pos_tag</span>
+<span class="kn">from</span> <span class="nn">nltk.stem</span> <span class="k">import</span> <span class="n">WordNetLemmatizer</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="k">import</span> <span class="n">word_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="k">import</span> <span class="n">stopwords</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="k">import</span> <span class="n">punctuation</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="n">stopwds</span> <span class="o">=</span> <span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s">&#39;english&#39;</span><span class="p">)</span>
+<span class="n">stopwds_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwds</span><span class="p">)</span>
+<span class="c">#print(stopwds)</span>
+
+<span class="k">def</span> <span class="nf">penn_to_wordnet</span><span class="p">(</span><span class="n">penn_tag</span><span class="p">):</span>     <span class="c">#this function converts Penn Treebank tag to WordNet tag</span>
+    <span class="n">morphy_tag</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;NN&#39;</span><span class="p">:</span><span class="s">&#39;n&#39;</span><span class="p">,</span> <span class="s">&#39;JJ&#39;</span><span class="p">:</span><span class="s">&#39;a&#39;</span><span class="p">,</span><span class="s">&#39;VB&#39;</span><span class="p">:</span><span class="s">&#39;v&#39;</span><span class="p">,</span> <span class="s">&#39;RB&#39;</span><span class="p">:</span><span class="s">&#39;r&#39;</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">morphy_tag</span><span class="p">[</span><span class="n">penn_tag</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;n&#39;</span>
+    
+
+<span class="n">punc_extra</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;’&#39;</span><span class="p">,</span><span class="s">&#39;‘&#39;</span><span class="p">])</span>
+
+<span class="n">stopwords_plus_punct</span> <span class="o">=</span> <span class="n">stopwds_set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">punctuation</span><span class="p">))</span>
+<span class="n">stopwords_total</span> <span class="o">=</span> <span class="n">stopwords_plus_punct</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">punc_extra</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pre_processing</span><span class="p">(</span><span class="n">corpus</span><span class="p">):</span>   <span class="c">#corpus is a list of documents or provisions</span>
+    <span class="n">text_corpus</span> <span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus</span><span class="p">)):</span>
+        <span class="n">text_corpus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sentence</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">nltk</span><span class="o">.</span><span class="n">sent_tokenize</span><span class="p">(</span><span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">sentence</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span> <span class="c">#flatten the list text_corpus</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()]</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopwords_total</span><span class="p">]</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos_tag</span><span class="p">(</span><span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">WordNetLemmatizer</span><span class="p">()</span><span class="o">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">penn_to_wordnet</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span> <span class="k">for</span> <span class="n">word</span><span class="p">,</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">text_corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">text_corpus</span>
+        
+  
+<span class="n">tokens_dirs</span> <span class="o">=</span> <span class="n">pre_processing</span><span class="p">(</span><span class="n">dirs</span><span class="p">)</span>
+<span class="n">tokens_nims</span> <span class="o">=</span> <span class="n">pre_processing</span><span class="p">(</span><span class="n">nims</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">tokens_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c"># Just printing some pre-processed text to see the output</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokens_nims</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[&#39;directive&#39;, &#39;establishes&#39;, &#39;framework&#39;, &#39;achieve&#39;, &#39;sustainable&#39;, &#39;use&#39;, &#39;pesticide&#39;, &#39;reduce&#39;, &#39;risk&#39;, &#39;impact&#39;, &#39;pesticide&#39;, &#39;use&#39;, &#39;human&#39;, &#39;health&#39;, &#39;environment&#39;, &#39;promote&#39;, &#39;use&#39;, &#39;integrate&#39;, &#39;pest&#39;, &#39;management&#39;, &#39;alternative&#39;, &#39;approach&#39;, &#39;techniques&#39;, &#39;alternative&#39;, &#39;pesticide&#39;]
+[&#39;authorised&#39;, &#39;officer&#39;, &#39;mean&#39;, &#39;person&#39;, &#39;appoint&#39;, &#39;regulation&#39;, &#39;directive&#39;, &#39;mean&#39;, &#39;directive&#39;, &#39;european&#39;, &#39;parliament&#39;, &#39;council&#39;, &#39;october&#39;, &#39;inspector&#39;, &#39;pesticide&#39;, &#39;application&#39;, &#39;equipment&#39;, &#39;mean&#39;, &#39;person&#39;, &#39;complies&#39;, &#39;regulation&#39;, &#39;minister&#39;, &#39;mean&#39;, &#39;minister&#39;, &#39;agriculture&#39;, &#39;food&#39;, &#39;marine&#39;, &#39;national&#39;, &#39;action&#39;, &#39;plan&#39;, &#39;mean&#39;, &#39;plan&#39;, &#39;submit&#39;, &#39;minister&#39;, &#39;european&#39;, &#39;commission&#39;, &#39;article&#39;, &#39;directive&#39;, &#39;person&#39;, &#39;train&#39;, &#39;distributor&#39;, &#39;mean&#39;, &#39;person&#39;, &#39;trained&#39;, &#39;standard&#39;, &#39;distributor&#39;, &#39;accordance&#39;, &#39;article&#39;, &#39;directive&#39;, &#39;national&#39;, &#39;action&#39;, &#39;plan&#39;, &#39;premise&#39;, &#39;mean&#39;, &#39;land&#39;, &#39;without&#39;, &#39;building&#39;, &#39;register&#39;, &#39;mean&#39;, &#39;register&#39;, &#39;establish&#39;, &#39;regulation&#39;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we have all the tokens in a Bag-of-Words format. Next we need to use Vector Space Model to transform the corpus so that we can compute text similarity. This is done by devloping a dictionary of the tokens in the corpus and then using a measure like Term Frequency or TF-IDF (Term Frequency-Inverse Document Frequency). TF-IDF has shown better results in semantic similarity and information retrieval tasks, so we will be utilizing that.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="k">import</span> <span class="n">TfidfTransformer</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfVectorizer</span>
+
+<span class="n">countVec</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">countVec</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">tokens_dirs</span> <span class="o">+</span> <span class="n">tokens_nims</span><span class="p">,</span> <span class="p">[]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">countVec</span><span class="o">.</span><span class="n">vocabulary_</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">countVec</span><span class="o">.</span><span class="n">vocabulary_</span><span class="p">)</span> <span class="c"># This is our dictionary</span>
+
+<span class="c"># We have 995 unique tokens in the corpus</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>995
+{&#39;collapse&#39;: 153, &#39;regard&#39;: 753, &#39;due&#39;: 286, &#39;bird&#39;: 109, &#39;successfully&#39;: 885, &#39;school&#39;: 811, &#39;thereafter&#39;: 916, &#39;groundwater&#39;: 406, &#39;introduction&#39;: 470, &#39;cover&#39;: 218, &#39;training&#39;: 931, &#39;scale&#39;: 809, &#39;integrate&#39;: 463, &#39;attributable&#39;: 93, &#39;construct&#39;: 191, &#39;availability&#39;: 97, &#39;expression&#39;: 356, &#39;ii&#39;: 432, &#39;satisfy&#39;: 808, &#39;shall&#39;: 831, &#39;source&#39;: 848, &#39;mechanical&#39;: 541, &#39;facsimile&#39;: 360, &#39;name&#39;: 569, &#39;healthcare&#39;: 421, &#39;aerial&#39;: 36, &#39;transport&#39;: 935, &#39;operation&#39;: 604, &#39;update&#39;: 947, &#39;soon&#39;: 847, &#39;advisor&#39;: 34, &#39;information&#39;: 449, &#39;inform&#39;: 448, &#39;analysis&#39;: 57, &#39;habitat&#39;: 412, &#39;substantial&#39;: 883, &#39;minimum&#39;: 552, &#39;application&#39;: 69, &#39;sufficient&#39;: 886, &#39;people&#39;: 635, &#39;social&#39;: 843, &#39;website&#39;: 974, &#39;body&#39;: 110, &#39;judge&#39;: 477, &#39;secretary&#39;: 816, &#39;minister&#39;: 553, &#39;leave&#39;: 498, &#39;light&#39;: 509, &#39;determined&#39;: 258, &#39;think&#39;: 920, &#39;potential&#39;: 662, &#39;legislative&#39;: 503, &#39;date&#39;: 229, &#39;assessment&#39;: 88, &#39;operator&#39;: 605, &#39;sinkhole&#39;: 837, &#39;period&#39;: 638, &#39;survey&#39;: 896, &#39;calculation&#39;: 118, &#39;engage&#39;: 309, &#39;reasonably&#39;: 732, &#39;unwanted&#39;: 946, &#39;intend&#39;: 465, &#39;pass&#39;: 630, &#39;plan&#39;: 647, &#39;implementing&#39;: 440, &#39;accelerated&#39;: 2, &#39;facility&#39;: 359, &#39;registered&#39;: 757, &#39;cooperation&#39;: 208, &#39;proof&#39;: 699, &#39;enhance&#39;: 310, &#39;director&#39;: 268, &#39;toxic&#39;: 927, &#39;data&#39;: 227, &#39;advisory&#39;: 35, &#39;provident&#39;: 710, &#39;guilty&#39;: 411, &#39;wish&#39;: 981, &#39;specify&#39;: 854, &#39;context&#39;: 200, &#39;competent&#39;: 169, &#39;infringement&#39;: 451, &#39;vendor&#39;: 954, &#39;site&#39;: 839, &#39;refund&#39;: 751, &#39;abstraction&#39;: 1, &#39;viable&#39;: 960, &#39;leading&#39;: 496, &#39;residue&#39;: 784, &#39;evidence&#39;: 333, &#39;exposure&#39;: 354, &#39;may&#39;: 538, &#39;field&#39;: 371, &#39;believe&#39;: 104, &#39;health&#39;: 420, &#39;course&#39;: 216, &#39;industrial&#39;: 447, &#39;show&#39;: 833, &#39;pest&#39;: 642, &#39;trend&#39;: 937, &#39;harmonise&#39;: 416, &#39;approve&#39;: 78, &#39;exchange&#39;: 340, &#39;specified&#39;: 853, &#39;confer&#39;: 179, &#39;intervention&#39;: 469, &#39;operate&#39;: 603, &#39;strategy&#39;: 875, &#39;open&#39;: 602, &#39;destroyed&#39;: 253, &#39;action&#39;: 15, &#39;inspection&#39;: 456, &#39;oath&#39;: 585, &#39;micro&#39;: 549, &#39;necessary&#39;: 573, &#39;power&#39;: 663, &#39;garden&#39;: 396, &#39;schedule&#39;: 810, &#39;road&#39;: 798, &#39;producer&#39;: 690, &#39;requirement&#39;: 779, &#39;recently&#39;: 735, &#39;region&#39;: 754, &#39;estimate&#39;: 328, &#39;area&#39;: 82, &#39;healthy&#39;: 422, &#39;initial&#39;: 453, &#39;article&#39;: 85, &#39;answer&#39;: 63, &#39;approval&#39;: 77, &#39;accept&#39;: 3, &#39;deliver&#39;: 245, &#39;production&#39;: 692, &#39;prejudice&#39;: 667, &#39;establish&#39;: 325, &#39;damage&#39;: 225, &#39;full&#39;: 391, &#39;test&#39;: 913, &#39;development&#39;: 260, &#39;adverse&#39;: 32, &#39;sustainable&#39;: 898, &#39;sender&#39;: 824, &#39;hygiene&#39;: 430, &#39;connection&#39;: 181, &#39;change&#39;: 135, &#39;implementation&#39;: 438, &#39;enactment&#39;: 305, &#39;organic&#39;: 611, &#39;programme&#39;: 695, &#39;facilitate&#39;: 358, &#39;best&#39;: 105, &#39;state&#39;: 864, &#39;manometer&#39;: 530, &#39;certain&#39;: 129, &#39;result&#39;: 790, &#39;among&#39;: 55, &#39;discourage&#39;: 270, &#39;enquiry&#39;: 311, &#39;compare&#39;: 167, &#39;size&#39;: 842, &#39;transparent&#39;: 934, &#39;seal&#39;: 814, &#39;maintain&#39;: 524, &#39;progress&#39;: 696, &#39;officer&#39;: 597, &#39;shorter&#39;: 832, &#39;disruption&#39;: 274, &#39;registration&#39;: 758, &#39;vessel&#39;: 958, &#39;classification&#39;: 146, &#39;carcinogenic&#39;: 123, &#39;corporate&#39;: 210, &#39;designate&#39;: 252, &#39;seize&#39;: 820, &#39;close&#39;: 152, &#39;building&#39;: 114, &#39;cleaning&#39;: 149, &#39;yet&#39;: 993, &#39;recovery&#39;: 742, &#39;reasonable&#39;: 731, &#39;five&#39;: 379, &#39;achieve&#39;: 12, &#39;poison&#39;: 652, &#39;office&#39;: 596, &#39;safety&#39;: 803, &#39;finance&#39;: 374, &#39;term&#39;: 910, &#39;alternative&#39;: 52, &#39;accurate&#39;: 11, &#39;therein&#39;: 917, &#39;exceed&#39;: 337, &#39;regularly&#39;: 760, &#39;member&#39;: 544, &#39;vii&#39;: 963, &#39;sample&#39;: 805, &#39;choose&#39;: 140, &#39;element&#39;: 298, &#39;represent&#39;: 774, &#39;receive&#39;: 734, &#39;well&#39;: 976, &#39;dependency&#39;: 248, &#39;spraying&#39;: 858, &#39;concern&#39;: 175, &#39;something&#39;: 846, &#39;interval&#39;: 468, &#39;garda&#39;: 395, &#39;land&#39;: 488, &#39;link&#39;: 512, &#39;drinking&#39;: 285, &#39;argument&#39;: 83, &#39;landscape&#39;: 489, &#39;sell&#39;: 822, &#39;prior&#39;: 679, &#39;simple&#39;: 834, &#39;market&#39;: 535, &#39;contravenes&#39;: 204, &#39;mutagenic&#39;: 568, &#39;legible&#39;: 501, &#39;arise&#39;: 84, &#39;subsequent&#39;: 881, &#39;deem&#39;: 238, &#39;weather&#39;: 973, &#39;expedient&#39;: 348, &#39;iv&#39;: 474, &#39;respect&#39;: 785, &#39;carry&#39;: 125, &#39;prepaid&#39;: 669, &#39;complies&#39;: 172, &#39;limit&#39;: 510, &#39;dangerous&#39;: 226, &#39;demonstrate&#39;: 247, &#39;staff&#39;: 859, &#39;involve&#39;: 471, &#39;local&#39;: 515, &#39;poisoning&#39;: 653, &#39;comply&#39;: 173, &#39;problem&#39;: 683, &#39;parliament&#39;: 623, &#39;study&#39;: 876, &#39;employment&#39;: 304, &#39;pay&#39;: 631, &#39;substance&#39;: 882, &#39;community&#39;: 164, &#39;enter&#39;: 313, &#39;authorise&#39;: 94, &#39;work&#39;: 988, &#39;permeable&#39;: 639, &#39;submit&#39;: 878, &#39;natural&#39;: 571, &#39;quantitative&#39;: 724, &#39;adaptation&#39;: 20, &#39;great&#39;: 404, &#39;low&#39;: 520, &#39;advance&#39;: 30, &#39;public&#39;: 714, &#39;intermediate&#39;: 467, &#39;worker&#39;: 989, &#39;situation&#39;: 841, &#39;evaluate&#39;: 330, &#39;protection&#39;: 706, &#39;derogation&#39;: 249, &#39;agent&#39;: 40, &#39;exercisable&#39;: 345, &#39;basis&#39;: 102, &#39;nonprofessional&#39;: 578, &#39;marine&#39;: 533, &#39;grant&#39;: 402, &#39;least&#39;: 497, &#39;another&#39;: 62, &#39;protect&#39;: 705, &#39;reduce&#39;: 744, &#39;regional&#39;: 755, &#39;annex&#39;: 60, &#39;thematic&#39;: 915, &#39;toxicity&#39;: 928, &#39;place&#39;: 646, &#39;packaging&#39;: 618, &#39;amend&#39;: 53, &#39;applies&#39;: 71, &#39;stationary&#39;: 867, &#39;integration&#39;: 464, &#39;safeguard&#39;: 802, &#39;vary&#39;: 952, &#39;indicator&#39;: 446, &#39;january&#39;: 475, &#39;infrastructure&#39;: 450, &#39;regular&#39;: 759, &#39;special&#39;: 850, &#39;together&#39;: 924, &#39;seek&#39;: 819, &#39;satisfies&#39;: 807, &#39;bystander&#39;: 116, &#39;early&#39;: 288, &#39;paragraphs&#39;: 621, &#39;law&#39;: 493, &#39;final&#39;: 373, &#39;must&#39;: 567, &#39;function&#39;: 392, &#39;dispose&#39;: 273, &#39;actual&#39;: 18, &#39;storage&#39;: 871, &#39;statistical&#39;: 869, &#39;cease&#39;: 128, &#39;appoint&#39;: 73, &#39;impede&#39;: 436, &#39;buffer&#39;: 113, &#39;paragraph&#39;: 620, &#39;confirm&#39;: 180, &#39;payment&#39;: 632, &#39;society&#39;: 844, &#39;communicate&#39;: 162, &#39;technology&#39;: 909, &#39;describe&#39;: 250, &#39;offence&#39;: 594, &#39;refers&#39;: 749, &#39;employee&#39;: 302, &#39;unincorporated&#39;: 943, &#39;metre&#39;: 548, &#39;main&#39;: 523, &#39;vertical&#39;: 957, &#39;disclose&#39;: 269, &#39;anything&#39;: 64, &#39;drink&#39;: 284, &#39;water&#39;: 971, &#39;spray&#39;: 856, &#39;economically&#39;: 292, &#39;criterion&#39;: 220, &#39;provisional&#39;: 712, &#39;disposal&#39;: 272, &#39;journal&#39;: 476, &#39;equal&#39;: 320, &#39;mitigation&#39;: 555, &#39;preparation&#39;: 670, &#39;effect&#39;: 293, &#39;rule&#39;: 800, &#39;material&#39;: 536, &#39;correctly&#39;: 211, &#39;obstruct&#39;: 589, &#39;person&#39;: 641, &#39;authority&#39;: 96, &#39;sent&#39;: 825, &#39;clean&#39;: 148, &#39;successful&#39;: 884, &#39;account&#39;: 10, &#39;technique&#39;: 907, &#39;compatible&#39;: 168, &#39;fine&#39;: 376, &#39;accessory&#39;: 6, &#39;extract&#39;: 357, &#39;seizure&#39;: 821, &#39;careful&#39;: 124, &#39;instrument&#39;: 462, &#39;total&#39;: 926, &#39;dissuasive&#39;: 275, &#39;essential&#39;: 324, &#39;applied&#39;: 70, &#39;day&#39;: 230, &#39;penalty&#39;: 633, &#39;form&#39;: 385, &#39;relate&#39;: 764, &#39;put&#39;: 722, &#39;opposite&#39;: 607, &#39;obligation&#39;: 587, &#39;prevent&#39;: 675, &#39;nothing&#39;: 579, &#39;record&#39;: 739, &#39;park&#39;: 622, &#39;guidance&#39;: 409, &#39;relates&#39;: 765, &#39;faith&#39;: 363, &#39;summarily&#39;: 888, &#39;certification&#39;: 131, &#39;view&#39;: 962, &#39;refuse&#39;: 752, &#39;aircraft&#39;: 46, &#39;owner&#39;: 616, &#39;strainer&#39;: 873, &#39;adapted&#39;: 21, &#39;come&#39;: 155, &#39;whole&#39;: 979, &#39;line&#39;: 511, &#39;whether&#39;: 978, &#39;performance&#39;: 637, &#39;balance&#39;: 100, &#39;approximation&#39;: 80, &#39;formulate&#39;: 386, &#39;activity&#39;: 17, &#39;certify&#39;: 133, &#39;refer&#39;: 746, &#39;forward&#39;: 388, &#39;left&#39;: 499, &#39;endeavour&#39;: 308, &#39;síochána&#39;: 901, &#39;provide&#39;: 708, &#39;inspector&#39;: 457, &#39;timetable&#39;: 923, &#39;mount&#39;: 564, &#39;implication&#39;: 441, &#39;knowledge&#39;: 486, &#39;decision&#39;: 236, &#39;standard&#39;: 862, &#39;position&#39;: 657, &#39;mean&#39;: 539, &#39;commits&#39;: 159, &#39;withdraw&#39;: 982, &#39;incident&#39;: 444, &#39;number&#39;: 584, &#39;consultation&#39;: 195, &#39;reference&#39;: 747, &#39;playground&#39;: 650, &#39;act&#39;: 14, &#39;harmful&#39;: 415, &#39;move&#39;: 565, &#39;manage&#39;: 526, &#39;ordinarily&#39;: 610, &#39;ensure&#39;: 312, &#39;question&#39;: 726, &#39;possibility&#39;: 659, &#39;large&#39;: 490, &#39;responsible&#39;: 787, &#39;organisms&#39;: 614, &#39;october&#39;: 593, &#39;stakeholder&#39;: 860, &#39;agriculture&#39;: 42, &#39;however&#39;: 428, &#39;constitute&#39;: 190, &#39;assist&#39;: 89, &#39;legislation&#39;: 502, &#39;establishment&#39;: 327, &#39;require&#39;: 778, &#39;february&#39;: 368, &#39;enterprise&#39;: 314, &#39;release&#39;: 767, &#39;keep&#39;: 483, &#39;access&#39;: 4, &#39;use&#39;: 949, &#39;guideline&#39;: 410, &#39;direction&#39;: 266, &#39;fail&#39;: 362, &#39;relevant&#39;: 768, &#39;take&#39;: 902, &#39;post&#39;: 661, &#39;impact&#39;: 435, &#39;acute&#39;: 19, &#39;legal&#39;: 500, &#39;tank&#39;: 903, &#39;appointment&#39;: 74, &#39;defendant&#39;: 241, &#39;committed&#39;: 160, &#39;precautionary&#39;: 665, &#39;wholesaler&#39;: 980, &#39;population&#39;: 656, &#39;minimise&#39;: 551, &#39;harmonised&#39;: 417, &#39;prescribed&#39;: 671, &#39;implemented&#39;: 439, &#39;available&#39;: 98, &#39;agricultural&#39;: 41, &#39;adopt&#39;: 29, &#39;express&#39;: 355, &#39;affix&#39;: 39, &#39;promote&#39;: 698, &#39;switch&#39;: 899, &#39;design&#39;: 251, &#39;remnant&#39;: 770, &#39;hazardous&#39;: 419, &#39;responsibility&#39;: 786, &#39;cost&#39;: 213, &#39;review&#39;: 793, &#39;surface&#39;: 895, &#39;environmental&#39;: 318, &#39;possible&#39;: 660, &#39;commission&#39;: 157, &#39;approved&#39;: 79, &#39;attention&#39;: 92, &#39;principal&#39;: 677, &#39;associate&#39;: 90, &#39;custom&#39;: 223, &#39;modification&#39;: 558, &#39;technicians&#39;: 906, &#39;framework&#39;: 389, &#39;level&#39;: 505, &#39;train&#39;: 929, &#39;list&#39;: 513, &#39;prioritise&#39;: 680, &#39;property&#39;: 701, &#39;approach&#39;: 75, &#39;excess&#39;: 339, &#39;company&#39;: 165, &#39;interested&#39;: 466, &#39;licence&#39;: 507, &#39;regulatory&#39;: 762, &#39;bring&#39;: 112, &#39;resides&#39;: 783, &#39;feature&#39;: 367, &#39;procedure&#39;: 684, &#39;exclusively&#39;: 342, &#39;undertaken&#39;: 940, &#39;determine&#39;: 257, &#39;method&#39;: 547, &#39;message&#39;: 546, &#39;notice&#39;: 580, &#39;consist&#39;: 188, &#39;vulnerable&#39;: 966, &#39;trained&#39;: 930, &#39;thing&#39;: 919, &#39;november&#39;: 582, &#39;furnish&#39;: 393, &#39;waste&#39;: 970, &#39;relation&#39;: 766, &#39;also&#39;: 51, &#39;hop&#39;: 427, &#39;experience&#39;: 349, &#39;implement&#39;: 437, &#39;objective&#39;: 586, &#39;publication&#39;: 715, &#39;adduce&#39;: 26, &#39;charge&#39;: 136, &#39;never&#39;: 576, &#39;restriction&#39;: 789, &#39;defaults&#39;: 240, &#39;hazard&#39;: 418, &#39;valid&#39;: 951, &#39;thereof&#39;: 918, &#39;service&#39;: 828, &#39;subparagraph&#39;: 879, &#39;proportionate&#39;: 702, &#39;store&#39;: 872, &#39;continue&#39;: 201, &#39;prohibit&#39;: 697, &#39;advise&#39;: 33, &#39;money&#39;: 560, &#39;single&#39;: 836, &#39;council&#39;: 215, &#39;proceed&#39;: 685, &#39;exemption&#39;: 344, &#39;presence&#39;: 672, &#39;stop&#39;: 870, &#39;techniques&#39;: 908, &#39;pending&#39;: 634, &#39;support&#39;: 894, &#39;endanger&#39;: 307, &#39;expose&#39;: 353, &#39;fact&#39;: 361, &#39;criminal&#39;: 219, &#39;additive&#39;: 24, &#39;inspect&#39;: 455, &#39;biodiversity&#39;: 107, &#39;authorised&#39;: 95, &#39;mechanism&#39;: 542, &#39;allege&#39;: 47, &#39;verification&#39;: 955, &#39;bear&#39;: 103, &#39;hear&#39;: 423, &#39;agronomic&#39;: 43, &#39;either&#39;: 296, &#39;database&#39;: 228, &#39;revoke&#39;: 796, &#39;first&#39;: 377, &#39;plant&#39;: 649, &#39;supervision&#39;: 890, &#39;mix&#39;: 556, &#39;efficient&#39;: 295, &#39;welfare&#39;: 975, &#39;distance&#39;: 276, &#39;group&#39;: 407, &#39;helicopter&#39;: 424, &#39;justified&#39;: 481, &#39;time&#39;: 922, &#39;expiry&#39;: 351, &#39;difficult&#39;: 263, &#39;lay&#39;: 495, &#39;chemical&#39;: 138, &#39;avoid&#39;: 99, &#39;jurisdiction&#39;: 480, &#39;deduct&#39;: 237, &#39;procurement&#39;: 688, &#39;sewage&#39;: 830, &#39;requested&#39;: 777, &#39;send&#39;: 823, &#39;abet&#39;: 0, &#39;address&#39;: 25, &#39;renewal&#39;: 772, &#39;summary&#39;: 889, &#39;professional&#39;: 693, &#39;might&#39;: 550, &#39;apply&#39;: 72, &#39;fulfil&#39;: 390, &#39;machine&#39;: 521, &#39;system&#39;: 900, &#39;zone&#39;: 994, &#39;hold&#39;: 426, &#39;uniformed&#39;: 942, &#39;ancillary&#39;: 58, &#39;environment&#39;: 317, &#39;warning&#39;: 968, &#39;strategic&#39;: 874, &#39;good&#39;: 401, &#39;different&#39;: 262, &#39;point&#39;: 651, &#39;way&#39;: 972, &#39;referred&#39;: 748, &#39;adequate&#39;: 27, &#39;occasion&#39;: 591, &#39;identify&#39;: 431, &#39;encourage&#39;: 306, &#39;vicinity&#39;: 961, &#39;include&#39;: 445, &#39;provision&#39;: 711, &#39;know&#39;: 485, &#39;certificate&#39;: 130, &#39;eliminate&#39;: 299, &#39;write&#39;: 991, &#39;allow&#39;: 48, &#39;addition&#39;: 22, &#39;remove&#39;: 771, &#39;publish&#39;: 716, &#39;monitor&#39;: 561, &#39;subject&#39;: 877, &#39;applicable&#39;: 68, &#39;clerk&#39;: 151, &#39;emphasise&#39;: 301, &#39;delay&#39;: 244, &#39;calibration&#39;: 120, &#39;issue&#39;: 472, &#39;conduct&#39;: 178, &#39;sum&#39;: 887, &#39;drift&#39;: 283, &#39;gather&#39;: 397, &#39;force&#39;: 384, &#39;annul&#39;: 61, &#39;institute&#39;: 458, &#39;accessible&#39;: 5, &#39;give&#39;: 400, &#39;liable&#39;: 506, &#39;exercise&#39;: 346, &#39;complete&#39;: 170, &#39;economic&#39;: 291, &#39;moved&#39;: 566, &#39;emergency&#39;: 300, &#39;withdrawn&#39;: 984, &#39;remain&#39;: 769, &#39;recklessly&#39;: 737, &#39;text&#39;: 914, &#39;december&#39;: 234, &#39;amendment&#39;: 54, &#39;animal&#39;: 59, &#39;scientific&#39;: 812, &#39;ground&#39;: 405, &#39;supplementary&#39;: 891, &#39;year&#39;: 992, &#39;grassland&#39;: 403, &#39;neglect&#39;: 575, &#39;recreation&#39;: 743, &#39;oblige&#39;: 588, &#39;containing&#39;: 198, &#39;occupier&#39;: 592, &#39;present&#39;: 673, &#39;official&#39;: 598, &#39;omission&#39;: 599, &#39;administrative&#39;: 28, &#39;retailer&#39;: 791, &#39;purpose&#39;: 720, &#39;management&#39;: 527, &#39;concerned&#39;: 176, &#39;directive&#39;: 267, &#39;sport&#39;: 855, &#39;mark&#39;: 534, &#39;reception&#39;: 736, &#39;pesticides&#39;: 644, &#39;request&#39;: 776, &#39;employer&#39;: 303, &#39;feed&#39;: 370, &#39;fixed&#39;: 381, &#39;meet&#39;: 543, &#39;manager&#39;: 528, &#39;vi&#39;: 959, &#39;knapsack&#39;: 484, &#39;since&#39;: 835, &#39;possession&#39;: 658, &#39;specifically&#39;: 852, &#39;deal&#39;: 231, &#39;waive&#39;: 967, &#39;last&#39;: 491, &#39;role&#39;: 799, &#39;false&#39;: 364, &#39;clear&#39;: 150, &#39;impurity&#39;: 442, &#39;sector&#39;: 818, &#39;soil&#39;: 845, &#39;monitoring&#39;: 562, &#39;near&#39;: 572, &#39;sprayer&#39;: 857, &#39;punish&#39;: 717, &#39;capable&#39;: 121, &#39;proximity&#39;: 713, &#39;human&#39;: 429, &#39;calculate&#39;: 117, &#39;cite&#39;: 144, &#39;reinstate&#39;: 763, &#39;working&#39;: 990, &#39;party&#39;: 629, &#39;mixtures&#39;: 557, &#39;offer&#39;: 595, &#39;class&#39;: 145, &#39;notify&#39;: 581, &#39;construction&#39;: 192, &#39;lie&#39;: 508, &#39;control&#39;: 206, &#39;equip&#39;: 321, &#39;organism&#39;: 613, &#39;case&#39;: 126, &#39;high&#39;: 425, &#39;reason&#39;: 730, &#39;container&#39;: 197, &#39;safe&#39;: 801, &#39;envisage&#39;: 319, &#39;compost&#39;: 174, &#39;apparatus&#39;: 65, &#39;plane&#39;: 648, &#39;decide&#39;: 235, &#39;priority&#39;: 681, &#39;child&#39;: 139, &#39;evaluation&#39;: 331, &#39;prove&#39;: 707, &#39;ingredient&#39;: 452, &#39;contain&#39;: 196, &#39;ass&#39;: 87, &#39;reduction&#39;: 745, &#39;affect&#39;: 38, &#39;undue&#39;: 941, &#39;define&#39;: 242, &#39;machinery&#39;: 522, &#39;station&#39;: 866, &#39;sale&#39;: 804, &#39;locate&#39;: 516, &#39;attach&#39;: 91, &#39;lodge&#39;: 518, &#39;every&#39;: 332, &#39;statistic&#39;: 868, &#39;contaminate&#39;: 199, &#39;conspicuous&#39;: 189, &#39;national&#39;: 570, &#39;treat&#39;: 936, &#39;examine&#39;: 335, &#39;type&#39;: 938, &#39;proposal&#39;: 703, &#39;matter&#39;: 537, &#39;supplier&#39;: 892, &#39;definition&#39;: 243, &#39;pesticide&#39;: 643, &#39;insert&#39;: 454, &#39;follow&#39;: 382, &#39;wherever&#39;: 977, &#39;comparability&#39;: 166, &#39;sit&#39;: 838, &#39;biocidal&#39;: 106, &#39;satisfied&#39;: 806, &#39;along&#39;: 49, &#39;equipment&#39;: 322, &#39;stand&#39;: 861, &#39;example&#39;: 336, &#39;residential&#39;: 782, &#39;contravention&#39;: 205, &#39;union&#39;: 944, &#39;consult&#39;: 194, &#39;manner&#39;: 529, &#39;permit&#39;: 640, &#39;situate&#39;: 840, &#39;instituted&#39;: 459, &#39;business&#39;: 115, &#39;resident&#39;: 781, &#39;technical&#39;: 905, &#39;unless&#39;: 945, &#39;package&#39;: 617, &#39;vineyard&#39;: 964, &#39;qualify&#39;: 723, &#39;risk&#39;: 797, &#39;already&#39;: 50, &#39;lawful&#39;: 494, &#39;statement&#39;: 865, &#39;long&#39;: 519, &#39;without&#39;: 986, &#39;set&#39;: 829, &#39;aquatic&#39;: 81, &#39;verify&#39;: 956, &#39;collect&#39;: 154, &#39;nozzles&#39;: 583, &#39;vehicle&#39;: 953, &#39;connivance&#39;: 182, &#39;appeal&#39;: 66, &#39;quantity&#39;: 725, &#39;ec&#39;: 289, &#39;entitle&#39;: 316, &#39;filter&#39;: 372, &#39;considers&#39;: 187, &#39;incentive&#39;: 443, &#39;later&#39;: 492, &#39;copy&#39;: 209, &#39;effective&#39;: 294, &#39;boom&#39;: 111, &#39;capacity&#39;: 122, &#39;chronic&#39;: 142, &#39;organisation&#39;: 612, &#39;refrain&#39;: 750, &#39;aid&#39;: 44, &#39;cultural&#39;: 222, &#39;july&#39;: 478, &#39;one&#39;: 600, &#39;affair&#39;: 37, &#39;new&#39;: 577, &#39;reappointing&#39;: 729, &#39;calibrate&#39;: 119, &#39;purport&#39;: 719, &#39;letter&#39;: 504, &#39;establishes&#39;: 326, &#39;european&#39;: 329, &#39;check&#39;: 137, &#39;amount&#39;: 56, &#39;presume&#39;: 674, &#39;upon&#39;: 948, &#39;railway&#39;: 727, &#39;make&#39;: 525, &#39;misuse&#39;: 554, &#39;generates&#39;: 399, &#39;accord&#39;: 8, &#39;regulation&#39;: 761, &#39;revision&#39;: 795, &#39;transitional&#39;: 932, &#39;withdrawal&#39;: 983, &#39;sow&#39;: 849, &#39;ready&#39;: 728, &#39;section&#39;: 817, &#39;excise&#39;: 341, &#39;policy&#39;: 654, &#39;consent&#39;: 183, &#39;premise&#39;: 668, &#39;location&#39;: 517, &#39;ecologically&#39;: 290, &#39;commit&#39;: 158, &#39;acquire&#39;: 13, &#39;program&#39;: 694, &#39;circumstance&#39;: 143, &#39;distributor&#39;: 277, &#39;delivery&#39;: 246, &#39;proceeding&#39;: 686, &#39;fix&#39;: 380, &#39;purchase&#39;: 718, &#39;detained&#39;: 255, &#39;servant&#39;: 826, &#39;deface&#39;: 239, &#39;base&#39;: 101, &#39;compliance&#39;: 171, &#39;corresponds&#39;: 212, &#39;farm&#39;: 366, &#39;orchard&#39;: 608, &#39;restrict&#39;: 788, &#39;product&#39;: 691, &#39;recoverable&#39;: 741, &#39;specific&#39;: 851, &#39;institution&#39;: 460, &#39;especially&#39;: 323, &#39;onus&#39;: 601, &#39;private&#39;: 682, &#39;electronic&#39;: 297, &#39;proceeds&#39;: 687, &#39;consider&#39;: 185, &#39;recognise&#39;: 738, &#39;receipt&#39;: 733, &#39;immediate&#39;: 434, &#39;except&#39;: 338, &#39;word&#39;: 987, &#39;food&#39;: 383, &#39;report&#39;: 773, &#39;advantage&#39;: 31, &#39;live&#39;: 514, &#39;three&#39;: 921, &#39;appropriate&#39;: 76, &#39;expert&#39;: 350, &#39;mention&#39;: 545, &#39;reproduction&#39;: 775, &#39;modify&#39;: 559, &#39;explicitly&#39;: 352, &#39;determination&#39;: 256, &#39;standardisation&#39;: 863, &#39;certified&#39;: 132, &#39;additional&#39;: 23, &#39;perform&#39;: 636, &#39;partner&#39;: 627, &#39;tool&#39;: 925, &#39;practice&#39;: 664, &#39;reside&#39;: 780, &#39;register&#39;: 756, &#39;participation&#39;: 625, &#39;otherwise&#39;: 615, &#39;general&#39;: 398, &#39;measure&#39;: 540, &#39;contrary&#39;: 203, &#39;appear&#39;: 67, &#39;far&#39;: 365, &#39;dealt&#39;: 232, &#39;condition&#39;: 177, &#39;customer&#39;: 224, &#39;page&#39;: 619, &#39;serve&#39;: 827, &#39;formulation&#39;: 387, &#39;draw&#39;: 282, &#39;crop&#39;: 221, &#39;classify&#39;: 147, &#39;revise&#39;: 794, &#39;suspect&#39;: 897, &#39;preference&#39;: 666, &#39;prosecution&#39;: 704, &#39;cause&#39;: 127, &#39;aim&#39;: 45, &#39;committee&#39;: 161, &#39;handheld&#39;: 413, &#39;device&#39;: 261, &#39;entirely&#39;: 315, &#39;conviction&#39;: 207, &#39;consideration&#39;: 186, &#39;pollution&#39;: 655, &#39;find&#39;: 375, &#39;need&#39;: 574, &#39;communication&#39;: 163, &#39;commercial&#39;: 156, &#39;part&#39;: 624, &#39;discussion&#39;: 271, &#39;item&#39;: 473, &#39;principle&#39;: 678, &#39;court&#39;: 217, &#39;opinion&#39;: 606, &#39;do&#39;: 280, &#39;divide&#39;: 279, &#39;manufacture&#39;: 531, &#39;conservation&#39;: 184, &#39;partnership&#39;: 628, &#39;transmission&#39;: 933, &#39;develop&#39;: 259, &#39;district&#39;: 278, &#39;voluntary&#39;: 965, &#39;proper&#39;: 700, &#39;could&#39;: 214, &#39;retain&#39;: 792, &#39;document&#39;: 281, &#39;particular&#39;: 626, &#39;biological&#39;: 108, &#39;fee&#39;: 369, &#39;territory&#39;: 912, &#39;physical&#39;: 645, &#39;recover&#39;: 740, &#39;provided&#39;: 709, &#39;active&#39;: 16, &#39;subparagraphs&#39;: 880, &#39;handle&#39;: 414, &#39;construe&#39;: 193, &#39;gain&#39;: 394, &#39;order&#39;: 609, &#39;chooses&#39;: 141, &#39;fit&#39;: 378, &#39;produce&#39;: 689, &#39;examination&#39;: 334, &#39;target&#39;: 904, &#39;exempt&#39;: 343, &#39;pursuant&#39;: 721, &#39;june&#39;: 479, &#39;terminate&#39;: 911, &#39;undergo&#39;: 939, &#39;warrant&#39;: 969, &#39;supply&#39;: 893, &#39;existing&#39;: 347, &#39;scrutiny&#39;: 813, &#39;contract&#39;: 202, &#39;month&#39;: 563, &#39;accompany&#39;: 7, &#39;accordance&#39;: 9, &#39;dwelling&#39;: 287, &#39;obtain&#39;: 590, &#39;dilution&#39;: 264, &#39;search&#39;: 815, &#39;growth&#39;: 408, &#39;karst&#39;: 482, &#39;within&#39;: 985, &#39;label&#39;: 487, &#39;debt&#39;: 233, &#39;iii&#39;: 433, &#39;user&#39;: 950, &#39;detain&#39;: 254, &#39;instruction&#39;: 461, &#39;direct&#39;: 265, &#39;chain&#39;: 134, &#39;ascertain&#39;: 86, &#39;many&#39;: 532, &#39;prevents&#39;: 676}
+</pre>
+</div>
 </div>
 
 </div>
@@ -1047,11 +1218,33 @@ h6:hover .anchor-link {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">merge_tokens_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">tokens_dirs</span><span class="p">]</span> <span class="c">#only relevant tokens after pre-processing </span>
+<span class="n">merge_tokens_nims</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">tokens_nims</span><span class="p">]</span>
 
-<span class="o">%</span><span class="k">matplotlib</span> inline
 
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="c">#print(tfidf_tokens_dirs)</span>
+
+<span class="n">tfidf_dirs</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">vocabulary</span><span class="o">=</span><span class="n">countVec</span><span class="o">.</span><span class="n">vocabulary_</span><span class="p">,</span> <span class="n">sublinear_tf</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">merge_tokens_dirs</span><span class="p">)</span>
+<span class="n">tfidf_nims</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">vocabulary</span><span class="o">=</span><span class="n">countVec</span><span class="o">.</span><span class="n">vocabulary_</span><span class="p">,</span> <span class="n">sublinear_tf</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">merge_tokens_nims</span><span class="p">)</span>
+
+<span class="c">#print(tfidf_dirs[0])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">cosine_similarity</span>
+<span class="n">similarity_matrix</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">tfidf_dirs</span><span class="p">,</span><span class="n">tfidf_nims</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">similarity_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c"># 64 articles and 97 provisions</span>
+<span class="c">#Each row represents the similarity value of 1 article with all 97 provisions</span>
 </pre></div>
 
 </div>
@@ -1064,96 +1257,226 @@ h6:hover .anchor-link {
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[4]:</div>
+<div class="prompt"></div>
 
 
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>(array([ 2.,  1.,  1.,  0.,  2.,  0.,  1.,  0.,  0.,  2.]),
- array([  1. ,   1.9,   2.8,   3.7,   4.6,   5.5,   6.4,   7.3,   8.2,
-          9.1,  10. ]),
- &lt;a list of 10 Patch objects&gt;)</pre>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>97
+(64, 97)
+[ 0.22657175  0.          0.          0.          0.          0.
+  0.04596348  0.11766829  0.12123969  0.          0.05140329  0.06734744
+  0.02686632  0.18316336  0.08868748  0.02273343  0.          0.0267213
+  0.03049346  0.          0.03039958  0.05411121  0.05531678  0.03368492
+  0.05387575  0.          0.02827566  0.          0.          0.          0.
+  0.08171334  0.06192182  0.11544368  0.05126898  0.11299006  0.23264191
+  0.16235474  0.19610278  0.08579729  0.16906902  0.          0.          0.
+  0.          0.          0.          0.          0.          0.          0.
+  0.          0.          0.          0.05455542  0.0769745   0.04172318
+  0.          0.          0.          0.          0.07108179  0.
+  0.03530458  0.          0.          0.          0.07564871  0.02770695
+  0.          0.0782996   0.          0.          0.          0.09313598
+  0.          0.          0.          0.          0.02965312  0.02364624
+  0.03340673  0.02098697  0.02764232  0.          0.04078585  0.          0.
+  0.          0.          0.          0.03565188  0.          0.03866574
+  0.          0.          0.        ]
+0.226571748286
+</pre>
+</div>
 </div>
 
 </div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we have the similarity values in similarity_matrix. We utilized cosine similarity to compute similarity values over the TF-IDF corpus transform.  Next we implement Latent Semantic Analysis (LSA or LSI) on top of TF-IDF transform. LSI is able to club words which occur in similar contexts together by applying a SVD transform to represent relationships between terms in a reduced dimensional space. This is done to reduce the variability in word usage and uncover important latent relationships between terms which have same meaning but do not occuer in the same provision.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[72]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">gensim</span> <span class="k">import</span> <span class="n">corpora</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">similarities</span>
+
+<span class="n">dictionary</span> <span class="o">=</span> <span class="n">corpora</span><span class="o">.</span><span class="n">Dictionary</span><span class="p">(</span><span class="n">tokens_dirs</span> <span class="o">+</span> <span class="n">tokens_nims</span><span class="p">)</span>
+
+<span class="n">corpus_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dictionary</span><span class="o">.</span><span class="n">doc2bow</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">tokens_dirs</span><span class="p">]</span>
+<span class="n">corpus_nims</span> <span class="o">=</span> <span class="p">[</span><span class="n">dictionary</span><span class="o">.</span><span class="n">doc2bow</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">tokens_nims</span><span class="p">]</span>
+
+<span class="n">corpus_comb</span> <span class="o">=</span> <span class="n">corpus_dirs</span> <span class="o">+</span> <span class="n">corpus_nims</span>  
+    
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[73]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="n">tfidf</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TfidfModel</span><span class="p">(</span><span class="n">corpus_comb</span><span class="p">)</span>
+
+<span class="n">corpus_tfidf_nims</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">[</span><span class="n">corpus_nims</span><span class="p">]</span>
+<span class="n">corpus_tfidf_dirs</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">[</span><span class="n">corpus_dirs</span><span class="p">]</span>
+<span class="n">corpus_tfidf_comb</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">[</span><span class="n">corpus_comb</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">corpus_tfidf_comb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
 
 <div class="output_area">
 
 <div class="prompt"></div>
 
 
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[(0, 0.20994966227444148), (1, 0.35469613661261146), (2, 0.25418726878715903), (3, 0.09924503691216971), (4, 0.13311046179358815), (5, 0.32430221623147443), (6, 0.32430221623147443), (7, 0.13311046179358815), (8, 0.14735179018060407), (9, 0.20011155384794918), (10, 0.17126524152854397), (11, 0.15147072737470796), (12, 0.17126524152854397), (13, 0.17073806271453315), (14, 0.25418726878715903), (15, 0.19158939669332165), (16, 0.13311046179358815), (17, 0.23582700320603922), (18, 0.32430221623147443), (19, 0.23985916761242293)]
+</pre>
 </div>
-
 </div>
 
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="n">lsi</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">LsiModel</span><span class="p">(</span><span class="n">corpus_tfidf_comb</span><span class="p">,</span> <span class="n">id2word</span><span class="o">=</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">num_topics</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">corpus_lsi_nims</span> <span class="o">=</span> <span class="n">lsi</span><span class="p">[</span><span class="n">corpus_tfidf_nims</span><span class="p">]</span>
+<span class="n">corpus_lsi_dirs</span> <span class="o">=</span> <span class="n">lsi</span><span class="p">[</span><span class="n">corpus_tfidf_dirs</span><span class="p">]</span>
+<span class="n">corpus_lsi_comb</span> <span class="o">=</span> <span class="n">lsi</span><span class="p">[</span><span class="n">corpus_tfidf_comb</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">lsi_matrix_dirs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_dirs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_dirs</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="n">lsi_matrix_dirs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">corpus_lsi_dirs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        
+<span class="c">#print(lsi_matrix_dirs)</span>
+        
+<span class="n">lsi_matrix_nims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_nims</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_nims</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_nims</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus_lsi_nims</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="n">lsi_matrix_nims</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">corpus_lsi_nims</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        
+<span class="n">dir_lsi_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">lsi_matrix_dirs</span><span class="p">)</span>
+<span class="n">nim_lsi_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asmatrix</span><span class="p">(</span><span class="n">lsi_matrix_nims</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">cosine_similarity</span>
+<span class="n">lsi_similarity_matrix</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">dir_lsi_matrix</span><span class="p">,</span><span class="n">nim_lsi_matrix</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[62]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="k">def</span> <span class="nf">most_similar_nim_provision</span><span class="p">(</span><span class="n">art_index</span><span class="p">,</span><span class="n">matrix</span><span class="p">):</span>
+    <span class="n">reqd_list</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">art_index</span><span class="p">]</span>
+    <span class="n">most_similar_value</span><span class="p">,</span><span class="n">index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([(</span><span class="n">v</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reqd_list</span><span class="p">)])</span> <span class="c"># v is value and i is index</span>
+    <span class="k">return</span> <span class="n">most_similar_value</span><span class="p">,</span><span class="n">index</span>
+
+
+<span class="c">#nim_similarity_value = most_similar_nim_provision(14,similarity_matrix)[0]  # [0] returns similarity value, and [1] is index of the value</span>
+
+<span class="c">#nim_index = most_similar_nim_provision(14,similarity_matrix)[1]    # [1] is index of the value</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;Query /Article is :</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">15</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;===================================================================================&quot;</span><span class="p">)</span>
+<span class="n">nim_similarity_value_tfidf</span><span class="p">,</span> <span class="n">nim_index_tfidf_cosine</span> <span class="o">=</span> <span class="n">most_similar_nim_provision</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="n">similarity_matrix</span><span class="p">)</span>
+
+<span class="n">nim_similarity_value_lsi</span><span class="p">,</span> <span class="n">nim_index_lsi</span> <span class="o">=</span> <span class="n">most_similar_nim_provision</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="n">lsi_similarity_matrix</span><span class="p">)</span>
+
+
+<span class="c">#nims[most_similar_nim_provisions(0)  </span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;Most Similar NIM provision as per TF-IDF Cosine:</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">nims</span><span class="p">[</span><span class="n">nim_index_tfidf_cosine</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;=======================================================================&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;Most Similar NIM provision as per LSI:</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">nims</span><span class="p">[</span><span class="n">nim_index_lsi</span><span class="p">])</span>
+
+    
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Query /Article is :
+Member States shall require distributors selling pesticides to non-professional users to provide general information regarding the risks for human health and the environment of pesticide use, in particular on hazards, exposure, proper storage, handling, application and safe disposal in accordance with Community legislation on waste, as well as regarding low-risk alternatives. Member States may require pesticide producers to provide such information.
+===================================================================================
+Most Similar NIM provision as per TF-IDF Cosine:
+Subject to paragraph (2), a distributor or a person trained to act as a distributor shall—
+(a) be entered in the Register,
+(b) hold a certificate confirming that—
+(i) the distributor, or
+(ii) the person trained to act as a distributor, has been trained to a standard determined by the Minister in the subjects listed in Annex I of the Directive,
+(c) comply with any additional training requirements as determined by the Minister,
+(d) sell pesticides approved for professional use only, to a person whom the distributor or person trained as a distributor is satisfied is a professional user, and
+(e) in the case of a distributor, have available, at the time of sale a person trained to act as a distributor to provide information to customers regarding the risks for health and the environment of pesticide use, in particular on hazards, exposure, proper storage, handling, application, safe disposal and low risk alternatives.
+=======================================================================
+Most Similar NIM provision as per LSI:
+A professional user or a distributor shall store, handle and package a pesticide in a manner determined by the Minister to ensure that human health or the environment are not endangered.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The above example shows that the provision retrived by TF-IDF Cosine VSM model is quite relevant to the query article as both of them have many similar words and also similar semantic meaning. Whereas the provision retrieved by LSI, partially captures the same semantic meaning but with different words. LSI extracts meaning of words by analyzing patterns in word usage in different texts. Words which co-occur with same words in different documents are similar.</p>
+
+</div>
+</div>
 </div>
  
 
@@ -1195,7 +1518,7 @@ l6SGjLskNWTcJakh4y5JDf0vZB9FlJ1A1boAAAAASUVORK5CYII=
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="http://rohannanda17.github.io/second-post.html" rel="bookmark"
+                    <h1><a href="/second-post.html" rel="bookmark"
                            title="Permalink to Seocnd Post">Seocnd Post</a></h1>
                 </header>
 
@@ -1206,10 +1529,10 @@ l6SGjLskNWTcJakh4y5JDf0vZB9FlJ1A1boAAAAASUVORK5CYII=
         </abbr>
 
         <address class="vcard author">
-                By                         <a class="url fn" href="http://rohannanda17.github.io/author/rohan.html">Rohan</a>
+                By                         <a class="url fn" href="/author/rohan.html">Rohan</a>
         </address>
-<p>In <a href="http://rohannanda17.github.io/category/posts.html">posts</a>.</p>
-<p>tags: <a href="http://rohannanda17.github.io/tag/python.html">python</a> </p>
+<p>In <a href="/category/posts.html">posts</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> </p>
 </footer><!-- /.post-info -->                
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -1222,7 +1545,7 @@ l6SGjLskNWTcJakh4y5JDf0vZB9FlJ1A1boAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-                <a class="readmore" href="http://rohannanda17.github.io/second-post.html">read more</a>
+                <a class="readmore" href="/second-post.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->
@@ -1240,7 +1563,6 @@ l6SGjLskNWTcJakh4y5JDf0vZB9FlJ1A1boAAAAASUVORK5CYII=
                 <div class="social">
                         <h2>social</h2>
                         <ul>
-                            <li><a href="http://rohannanda17.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
 
                             <li><a href="#">You can add links in your config file</a></li>
                             <li><a href="#">Another social link</a></li>
