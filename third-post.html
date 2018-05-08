@@ -22,7 +22,7 @@
   <article>
     <header>
       <h1 class="entry-title">
-        <a href="/third-post.html" rel="bookmark"
+        <a href="/sts_supervised_spark.html" rel="bookmark"
            title="Permalink to Supervised Short Text Similarity using Apache Spark">Supervised Short Text Similarity using Apache Spark</a></h1>
     </header>
 
@@ -36,7 +36,7 @@
                 By                         <a class="url fn" href="/author/rohan.html">Rohan</a>
         </address>
 <p>In <a href="archives.html">posts</a>.</p>
-<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/natural-language-processing.html">Natural Language Processing</a> <a href="/tag/text-similarity.html">Text Similarity</a> <a href="/tag/machine-learning.html">Machine Learning</a> <a href="/tag/apache-spark.html">Apache Spark</a> </p>
+
 </footer><!-- /.post-info -->      <style type="text/css">/*!
 *
 * IPython notebook
@@ -1007,7 +1007,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In this post we will again implement Machine Learning classifiers (See previous post) to identify semantically similar legal provisions (Directive articles and NIM provisions). But this time we will do it using <a href="https://github.com/apache/spark">Apache Spark</a>. Spark is useful for building Big Data applications. We will utilize PySpark which is the Spark Python API. Spark can also be programmed using Scala and Java. The objective is exactly same as the last post, ie. to classify whether two legal provisions are similar or not.</p>
+<p>In this post we will again implement Machine Learning classifiers <a href="https://rohannanda17.github.io/sts_supervised.html" target="_blank"> (See previous post) </a> to identify semantically similar legal provisions (Directive articles and NIM provisions). But this time we will do it using <a href="https://github.com/apache/spark">Apache Spark</a>. Spark is useful for building Big Data applications. We will utilize PySpark which is the Spark Python API. Spark can also be programmed using Scala and Java. The objective is exactly the same as the last post, ie. to classify whether two legal provisions are similar or not.</p>
 
 </div>
 </div>
@@ -1039,8 +1039,8 @@ h6:hover .anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We will use the same data from the last post of supervised text similarity. This is a binary classification problem.</p>
-<p><img src="binary_classification.png" width="500" height="400" align="center" /></p>
-<p>We will read both "YES/True" and "NO/False" label csv files and store them in pandas dataFrame. Then we will convert pandas dataFrame to spark dataFrame. Later we will utilize Spark ML library for pre-processin and fearture extraction.</p>
+<p><img src="binary_classification.png" width="355" height="125" align="center" /></p>
+<p>We will read both "YES/True" and "NO/False" label csv files and store them in pandas dataFrame. Then we will convert pandas dataFrame to Spark dataFrame. Later we will utilize Spark ML library for pre-processing and feature extraction.</p>
 
 </div>
 </div>
@@ -1164,7 +1164,7 @@ only showing top 20 rows
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The next step involves text pre-processing and transformation using TF-IDF features. We will not go in detail in pre-processing as it was well-discussed in the previosu supervised similarity post. We will utilze the Spark Pipelines. Both articles and provisions are processed separately as shown below. It is important to note that the class label(True/False) variable in Spark has to be numeric. Therefore, we will utilize a <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#stringindexer">StringIndexer</a> function to convert into a label column with 0 and 1 replacing False and True respectively. Also it is possible to have only one "features" column which can be used to predict the class label. Since we have to utilize two different texts (articles and provisions) we utilize <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#vectorassembler">VectorAssembler</a> which merges the individual features of both articles and provisions into the feature column.</p>
+<p>The next step involves text pre-processing and transformation using TF-IDF features. We will not go in detail in pre-processing as it was well-discussed in the<a href="https://rohannanda17.github.io/sts_supervised.html" target="_blank"> previous supervised similarity post </a>. We will utilze the Spark Pipelines. Both articles and provisions are processed separately as shown below. It is important to note that the class label(True/False) variable in Spark has to be numeric. Therefore, we will utilize a <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#stringindexer">StringIndexer</a> function to convert into a label column with 0 and 1 replacing False and True respectively. Also it is possible to have only one "features" column which can be used to predict the class label. Since we have to utilize two different texts (articles and provisions) we utilize <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#vectorassembler">VectorAssembler</a> which merges the individual features of both articles and provisions into the feature column.</p>
 
 </div>
 </div>
@@ -1523,7 +1523,7 @@ Test Set Instances: 125
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The results are similar to the ones obtained using Python's sklearn library in the last post. Both SVM and Logistic Regression performing better than Naive Bayes. This was a brief introduction to Spark for the supervised similarity task.</p>
+<p>The results are similar to the ones obtained using Python's sklearn library in the last post. Both SVM and Logistic Regression perform better than Naive Bayes. This was a brief introduction to Spark for the supervised similarity task.</p>
 
 </div>
 </div>
