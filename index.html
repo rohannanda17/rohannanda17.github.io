@@ -3304,34 +3304,55 @@ This Directive establishes a framework to achieve a sustainable use of pesticide
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/second-post.html" rel="bookmark"
-                           title="Permalink to Seocnd Post">Seocnd Post</a></h1>
+                    <h1><a href="/sts_supervised.html" rel="bookmark"
+                           title="Permalink to Supervised Short Text Similarity using Machine Learning">Supervised Short Text Similarity using Machine Learning</a></h1>
                 </header>
 
                 <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2016-06-08T20:00:00+02:00">
-                Published: Wed 08 June 2016
+        <abbr class="published" title="2018-04-24T14:00:00+02:00">
+                Published: Tue 24 April 2018
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/rohan.html">Rohan</a>
         </address>
 <p>In <a href="/category/posts.html">posts</a>.</p>
-<p>tags: <a href="/tag/python.html">python</a> </p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/natural-language-processing.html">Natural Language Processing</a> <a href="/tag/text-similarity.html">Text Similarity</a> <a href="/tag/machine-learning.html">Machine Learning</a> </p>
 </footer><!-- /.post-info -->                
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="First-post!">First post!<a class="anchor-link" href="#First-post!">&#182;</a></h1><p>This will be the first post in our new Pelican blog! You can add any code or markdown cells to this Jupyter notebook, and they will be rendered on your blog.</p>
+<p>In this post we will explore <a href="https://en.wikipedia.org/wiki/Supervised_learning">supervised machine learning</a> techniques to identify semantically similar legal text provisions. The objective is same as the last post, to find the transposing NIM provisions for a particular article of the directive. But in this case we will utilize labelled training data. The dataset is annotated by legal professionals. If a NIM provision, P transposes a directive article, A then they are considered to be similar (represented by "YES" label). The dataset has the following format.</p>
+                <a class="readmore" href="/sts_supervised.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/sts_supervised_spark.html" rel="bookmark"
+                           title="Permalink to Supervised Short Text Similarity using Apache Spark">Supervised Short Text Similarity using Apache Spark</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-04-24T14:00:00+02:00">
+                Published: Tue 24 April 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/rohan.html">Rohan</a>
+        </address>
+<p>In <a href="/category/posts.html">posts</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/natural-language-processing.html">Natural Language Processing</a> <a href="/tag/text-similarity.html">Text Similarity</a> <a href="/tag/machine-learning.html">Machine Learning</a> <a href="/tag/apache-spark.html">Apache Spark</a> </p>
+</footer><!-- /.post-info -->                
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-                <a class="readmore" href="/second-post.html">read more</a>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this post we will again implement Machine Learning classifiers (See previous post) to identify semantically similar legal provisions (Directive articles and NIM provisions). But this time we will do it using <a href="https://github.com/apache/spark">Apache Spark</a>. Spark is useful for building Big Data applications. We will utilize PySpark which is the Spark Python API. Spark can also be programmed using Scala and Java. The objective is exactly same as the last post, ie. to classify whether two legal provisions are similar or not.</p>
+                <a class="readmore" href="/sts_supervised_spark.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->
