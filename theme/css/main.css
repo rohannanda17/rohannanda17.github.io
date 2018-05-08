@@ -119,7 +119,7 @@ div.note {
    float: right;
    margin: 5px;
    font-size: 85%;
-   max-width: 800px;
+   max-width: 300px;
 }
 
 /* Tables */
@@ -147,7 +147,7 @@ aside, nav, article, figure {
 }
 
 /***** Layout *****/
-.body {clear: both; margin: 0 auto; width: 1200px;}
+.body {clear: both; margin: 0 auto; width: 800px;}
 img.right, figure.right {float: right; margin: 0 0 2em 2em;}
 img.left, figure.left {float: left; margin: 0 2em 2em 0;}
 
@@ -185,7 +185,7 @@ img.left, figure.left {float: left; margin: 0 2em 2em 0;}
 		margin: 0 auto 2em auto;
 		padding: 0;
 		text-align: center;
-		width: 1200px;
+		width: 800px;
 		
 		border-radius: 5px;
 		-moz-border-radius: 5px;
@@ -227,7 +227,7 @@ img.left, figure.left {float: left; margin: 0 2em 2em 0;}
 	margin-bottom: 2em;
 	overflow: hidden;
 	padding: 20px;
-	width: 1200px;
+	width: 760px;
 	
 	border-radius: 10px;
 	-moz-border-radius: 10px;
@@ -256,7 +256,7 @@ img.left, figure.left {float: left; margin: 0 2em 2em 0;}
 	margin-bottom: 2em;
 	overflow: hidden;
 	padding: 20px 20px;
-	width: 1200px;
+	width: 760px;
 	
 	border-radius: 10px;
 	-moz-border-radius: 10px;
@@ -345,7 +345,7 @@ img.left, figure.left {float: left; margin: 0 2em 2em 0;}
 	overflow: hidden;
 	padding: 20px;
 	text-align: left;
-	width: 1200px;
+	width: 760px;
 	
 	border-radius: 10px;
 	-moz-border-radius: 10px;
@@ -396,7 +396,7 @@ li:last-child .hentry, #content > .hentry {border: 0; margin: 0;}
 		position: relative;
         float: left;
 		top: 0.5em;
-		width: 1000px;
+		width: 190px;
 	}
 	
 	/* About the Author */
