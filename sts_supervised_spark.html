@@ -19,7 +19,7 @@
                 </ul></nav>
         </header><!-- /#banner -->
 <section id="content" class="body">
-  <article>
+  <article>   
     <header>
       <h1 class="entry-title">
         <a href="/sts_supervised_spark.html" rel="bookmark"
@@ -1164,7 +1164,7 @@ only showing top 20 rows
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The next step involves text pre-processing and transformation using TF-IDF features. We will not go in detail in pre-processing as it was well-discussed in the<a href="https://rohannanda17.github.io/sts_supervised.html" target="_blank"> previous supervised similarity post </a>. We will utilze the Spark Pipelines. Both articles and provisions are processed separately as shown below. It is important to note that the class label(True/False) variable in Spark has to be numeric. Therefore, we will utilize a <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#stringindexer">StringIndexer</a> function to convert into a label column with 0 and 1 replacing False and True respectively. Also it is possible to have only one "features" column which can be used to predict the class label. Since we have to utilize two different texts (articles and provisions) we utilize <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#vectorassembler">VectorAssembler</a> which merges the individual features of both articles and provisions into the feature column.</p>
+<p>The next step involves text pre-processing and transformation using TF-IDF features. We will not go in detail in pre-processing as it was well-discussed in the<a href="https://rohannanda17.github.io/first-post.html" target="_blank"> previous unsupervised similarity post </a>. We will utilze the Spark Pipelines. Both articles and provisions are processed separately as shown below. It is important to note that the class label(True/False) variable in Spark has to be numeric. Therefore, we will utilize a <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#stringindexer">StringIndexer</a> function to convert into a label column with 0 and 1 replacing False and True respectively. Also it is possible to have only one "features" column which can be used to predict the class label. Since we have to utilize two different texts (articles and provisions) we utilize <a href="https://spark.apache.org/docs/2.2.0/ml-features.html#vectorassembler">VectorAssembler</a> which merges the individual features of both articles and provisions into the feature column.</p>
 
 </div>
 </div>
